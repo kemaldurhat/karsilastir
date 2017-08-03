@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Welcome extends CI_Controller {
 	 public $baglimi = true;
-	 ///// ilk user kurulumu unutma ; dene
+	 ///// ilk user kurulumu unutma ;
 	public function index()
 	{
 		$this->session_control();
@@ -43,54 +43,8 @@ class Welcome extends CI_Controller {
 		$zaman = time();
 		$data["bugun"] =  mdate($tarih, $zaman);
 		
-		if($this->input->post("aciklama") )
-		{
-			$veriler["aciklama"] = $this->input->post("aciklama");
-			$veriler["odeme"] = $this->int_tutar(  $this->input->post("odeme"));
-			$veriler["user_id"] = $user_id;
-			
-			$ex = explode("/",$this->input->post("tarih") );
-			$str =  $ex[2]."-".$ex[1]."-".$ex[0];
-			$tarih = date("Y-m-d", strtotime($str));
-			$veriler["tarih"] = $tarih;
-			if($this->input->get("duzenle"))
-			{
-				$this->db->where('id',$this->input->get("duzenle"));
-				if($this->db->update('odemeler', $veriler))
-					$data["sonuc"] ="Ödeme Düzenleme Kaydı Başarılı";
-				else
-					$data["sonuc"] ="Ödeme Düzenleme  Kaydı başarısız";
-				
-				
-			}else{
-				if($this->db->insert('odemeler', $veriler))
-					$data["sonuc"] ="Ödeme Kaydı Başarılı";
-				else
-					$data["sonuc"] ="Ödeme Kaydı başarısız";
-				
-			}
-
-		}
-		
-			if($this->input->get("sil"))
-			{
-				$this->db->where('id',$this->input->get("sil"));
-				if($this->db->delete("odemeler"))
-						$data["sonuc"] ="Ödeme satırı silindi";
-				else
-					$data["sonuc"] ="Ödeme satırı silinemedi";
-				
-			}
-			if($this->input->get("duzenle"))
-			{
-				$data["veriler"] = $this->db->get_where("odemeler", array("user_id"=>$this->session->userdata('user_id'), "id"=> $this->input->get("duzenle")))->result()[0]; 
-				
-			}
-			
-		
 		if($this->input->get("sonuc"))
 			$data["sonuc"] = $this->input->get("sonuc"); 
-		
 		
 		$this->load->view('header', $data);
 		$this->load->view('sol');
@@ -658,6 +612,8 @@ class Welcome extends CI_Controller {
 		$veri["user_id"]	= $data["user"];
 		
 		
+
+		
 		if($this->input->post("hesap_tipleri"))
 		{
 			$this->load->model('db_islem');
@@ -748,11 +704,6 @@ class Welcome extends CI_Controller {
 							$id2 = $kontrol->result()[0]->baglanti_id;
 							$e4 = $this->db_islem->duzenle("hesaplar",$id2, $veri_);
 						}
-							
-					$link = base_url()."musteri_duzen?sonuc=".$data["sonuc"]; 
-					header("Location: $link");
-						
-						
 				}else{
 						$data[ "sonuc" ]  = "Hata !! Lütfen öncelikle bilgilerini düzenlemek istediğiniz müşteriyi seçiniz."; 
 				}
@@ -884,9 +835,6 @@ class Welcome extends CI_Controller {
 							$id2 = $kontrol->result()[0]->baglanti_id;
 							$e4 = $this->db_islem->duzenle("hesaplar",$id2, $veri_);
 						}
-							$link = base_url()."firma_duzen?sonuc=".$data["sonuc"]; 
-							header("Location: $link");
-						
 				}else{
 						$data[ "sonuc" ]  = "Hata !! Lütfen öncelikle bilgilerini düzenlemek istediğiniz firmayı seçiniz."; 
 				}
@@ -946,12 +894,12 @@ class Welcome extends CI_Controller {
 			$urun = $this->input->post("urun");
 			//$adet = $this->input->post("adet");
 			$firma = $this->input->post("firma");
-			//$alis =$this->int_tutar( $this->input->post("alis"));
+			$alis =$this->int_tutar( $this->input->post("alis"));
 			$satis = $this->int_tutar( $this->input->post("satis"));
 			$tarih = $this->input->post("tarih");
 			
 			$this->load->model('db_islem');
-			$veri = array (  "barkod" => $barkod, "urun" => $urun, "firma"=>$firma,  "satis"=>$satis, "tarih"=> $tarih, "user_id"=>$user_id );
+			$veri = array (  "barkod" => $barkod, "urun" => $urun, "firma"=>$firma, "alis"=>$alis, "satis"=>$satis, "tarih"=> $tarih, "user_id"=>$user_id );
 			
 			if($this->input->get("m"))
 			{
@@ -1009,17 +957,17 @@ class Welcome extends CI_Controller {
 			$firma =  $this->input->post("firma");
 			$urun =  $this->input->post("urun");
 			$adet = $this->input->post("adet");
-			//$alis = $this->int_tutar( $this->input->post("alis"));
-			//$odenen = $this->int_tutar( $this->input->post("odenen"));
+			$alis = $this->int_tutar( $this->input->post("alis"));
+			$odenen = $this->int_tutar( $this->input->post("odenen"));
 			
 			
 			$tarih = $this->input->post("tarih");
 			
 			$this->load->model('db_islem');
 			
-			$veri = array (   "u_id" => $urun, "adet"=> $adet,  "tarih"=> $tarih );
+			$veri = array (   "u_id" => $urun, "adet"=> $adet,  "alis"=>$alis, "odenen"=>$odenen, "tarih"=> $tarih );
 				/////////////////////////////////////////////////
-		/* 	if($this->baglimi)
+			if($this->baglimi)
 			{
 				$borc_  = $alis - $odenen;
 				if($borc_ >0 )
@@ -1029,7 +977,7 @@ class Welcome extends CI_Controller {
 				$ur = $this->db->get_where("urunler", array("id"=>$urun))->result()[0]->urun;
 				$veri_ = array (  "hesap_id"=>$hes_id, "tip_id"=>1, "aciklama"=>$adet." ".$ur." Stok alımı yapılmıştır.", "gider"=>$odenen, "borc"=>$odenen, "tarih"=>$tarih, "user_id"=>$user_id );
 				$veri_2 = array (  "hesap_id"=>$hes_id, "tip_id"=>1, "aciklama"=>$adet." ".$ur." Stok alımı yapılmıştır. Ödeme sonrası kalan tutardır.",  "alacak"=>$borc_, "tarih"=>$tarih, "user_id"=>$user_id );
-			} */
+			}
 			/////////////////////////////////////////////////
 			
 			if(!$this->bos_varmi(array($urun,$adet,$tarih)))
@@ -1038,28 +986,26 @@ class Welcome extends CI_Controller {
 				{
 					$data[ "sonuc" ]  = "Stok kaydınız başarı ile düzenlendi. "; 
 					$ekleme 						= $this->db_islem->duzenle("stoklar", $this->input->get("m"), $veri);
-					$link = base_url()."stok_duzen?sonuc=".$data["sonuc"]; 
-					header("Location: $link");
 				}else{
 					/////////////////////////////////////////////////
 				if($this->baglimi)
 				{
 					
 					$id1=  $this->db_islem->ekle("stoklar", $veri, 1);
-					/* $id2= $this->db_islem->ekle("cari", $veri_, 1);
+					$id2= $this->db_islem->ekle("cari", $veri_, 1);
 					if($alacak_bakiyesi)
 						$id3= $this->db_islem->ekle("cari", $veri_2, 1);
 					
 					$veri["baglanti_id"] = $id2;
 					$veri_["baglantili_id"] = $id1;
 					$veri_2["baglantili_id"] = $id1;
-					 */
+					
 					
 					$e3 = $this->db_islem->duzenle("stoklar",$id1, $veri);
-					//$e4 = $this->db_islem->duzenle("cari",$id2, $veri_);
-					/* 	if($alacak_bakiyesi)
+					$e4 = $this->db_islem->duzenle("cari",$id2, $veri_);
+					if($alacak_bakiyesi)
 						$e5 = $this->db_islem->duzenle("cari",$id3, $veri_2);
-					 */
+					
 				}else{
 					$ekleme = $this->db_islem->ekle("stoklar", $veri, "hepsi");
 				}
@@ -1260,13 +1206,13 @@ class Welcome extends CI_Controller {
 	public function stok_duzen()
 	{ 
 		$this->session_control();
-		$data["bos"] = $this->session->userdata('user_id');
+	$data["bos"] = $this->session->userdata('user_id');
 		$data["stoklar"] = $this->db->get("stoklar"); 
 		
 		
 		if($this->input->get("id"))
 		{
-			$data["sonuc"] = $this->stok_sil($this->input->get("id"), "stoklar"); 
+			$data["sonuc"] = $this->sil($this->input->get("id"), "stoklar"); 
 			$adres = base_url()."stok_duzen?sonuc=".$data["sonuc"]; 
 			header("Location: $adres");
 		}
@@ -1338,11 +1284,6 @@ class Welcome extends CI_Controller {
 				$duzenleme 	= $this->db_islem->duzenle("urunler", $u_->id, $veri_);
 			}
 			$data["sonuc"] = $this->sil($this->input->get("id"), "satislar"); 
-			$baglantili = $this->db->get_where("cari",array("baglantili_id"=>$this->input->get("id")));
-			foreach($baglantili->result() as $row){
-				$this->sil($row->id, "cari"); 
-			}
-			//caride bağlatılı id yi ve onun bağlantılı cari id sini sil
 			$adres = base_url()."satislar?sonuc=".$data["sonuc"]; 
 			header("Location: $adres");
 		}
@@ -1613,16 +1554,6 @@ class Welcome extends CI_Controller {
 				}else{
 					return $sonuc; 
 				}
-	}
-
-	public function stok_sil($id, $vt)
-	{
-				$sonuc = "Bu işlemi yapmaya yetkiniz bulunmamaktadır. ";
-				$this->load->model('db_islem');	
-				$silme = $this->db_islem->sil($vt,$id);
-				$sonuc = "Silme işlemi başarıyla gerçekleşti. ";
-				return $sonuc; 
-
 	}
 	public function sil2($id, $vt)
 	{
