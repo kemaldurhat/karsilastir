@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Welcome extends CI_Controller {
 	 public $baglimi = true;
-	 ///// ilk user kurulumu unutma ;
+	 ///// ilk user kurulumu unutma ; dene
 	public function index()
 	{
 		$this->session_control();
